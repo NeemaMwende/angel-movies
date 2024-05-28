@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import './Form.css';
-import { useState } from 'react';
 
 const Form = () => {
-    const [notification, setNotification] = useState('');
+  const [notification, setNotification] = useState('');
+  const [movies, setMovies] = useState([]);
+  const inputRef = useRef(null);
 
   const handleFocus = () => {
     setNotification('Please fill this field');
@@ -13,38 +14,48 @@ const Form = () => {
     setNotification('');
   };
 
-  const form = document.querySelector('form');
-  const container = document.querySelector('.image-container');
-
-  form.addEventListener(`submit`, (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let query = form.querySelector('input').value;
-    console.log(query);
-  });
+    const query = inputRef.current.value;
+    if (query) {
+      const res = await tvMazeApi(query);
+      setMovies(res);
+    } else {
+      setNotification('Please fill this field');
+    }
+  };
 
-  async function tvMazeApi(query){
-    const req = await fetch(`https://api.tvmaze.com/search/shows?q=${query}`)
+  const tvMazeApi = async (query) => {
+    const req = await fetch(`https://api.tvmaze.com/search/shows?q=${query}`);
     const res = await req.json();
-    console.log(res);
-}
+    return res;
+  };
 
   return (
-    <div className='form-content'>
-        <h1>Movie Search API</h1>
-        <form>
-            <input type="text" placeholder="Search for a movie" className='search-input'/>
-            <button className='search'
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-            >Search</button>
-            {notification && <p className="warning">{notification}</p>}
-
-            <div className='image-container'>
-                
-            </div>
-        </form>
+    <div className="form-content">
+      <h1>Movie Search API</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Search for a movie"
+          className="search-input"
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          ref={inputRef}
+        />
+        <button type="submit" className="search">Search</button>
+        {notification && <p className="warning">{notification}</p>}
+      </form>
+      <div className="image-container">
+        {movies.map((movie, index) => (
+          <div key={index}>
+            <h3>{movie.show.name}</h3>
+            {movie.show.image && <img src={movie.show.image.medium} alt={movie.show.name} />}
+          </div>
+        ))}
+      </div>
     </div>
-  )
-}
+  );
+};
 
 export default Form;
