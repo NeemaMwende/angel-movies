@@ -19,9 +19,9 @@ const Form = () => {
     const query = inputRef.current.value;
     if (query) {
       const res = await tvMazeApi(query);
-      setMovies(res);
+      setMovies(res.slice(0, 15)); // Limit the results to 15
     } else {
-      setNotification('Error fetching song');
+      setNotification('Error fetching movie');
     }
   };
 
@@ -48,9 +48,17 @@ const Form = () => {
       </form>
       <div className="image-container">
         {movies.map((movie, index) => (
-          <div key={index}>
+          <div key={index} className="movie-item">
             <h3>{movie.show.name}</h3>
             {movie.show.image && <img src={movie.show.image.medium} alt={movie.show.name} />}
+            <a
+              href={movie.show.officialSite || `https://www.tvmaze.com/shows/${movie.show.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="watch-link"
+            >
+              Watch
+            </a>
           </div>
         ))}
       </div>
