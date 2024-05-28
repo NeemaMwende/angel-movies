@@ -21,7 +21,7 @@ const Form = () => {
       const res = await tvMazeApi(query);
       setMovies(res);
     } else {
-      setNotification('Please fill this field');
+      setNotification('Error fetching song');
     }
   };
 
